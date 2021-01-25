@@ -1,0 +1,12 @@
+---
+# defaults file for provision_docker
+
+provision_docker_ssh_port_from: 27000
+provision_docker_container_prefix: 'ansible_test_container_magic5566_'
+provision_docker_host_group: 'test_containers_group'
+provision_docker_container_images:
+  - "ccy1219/docker-distro-ssh:ubuntu-16.04"
+  - "ccy1219/docker-distro-ssh:ubuntu-18.04"
+  - "ccy1219/docker-distro-ssh:ubuntu-20.04"
+  - "ccy1219/docker-distro-ssh:debian-9.13"
+  - "ccy1219/docker-distro-ssh:debian-10.6"

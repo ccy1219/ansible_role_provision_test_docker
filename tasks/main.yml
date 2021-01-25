@@ -1,0 +1,28 @@
+---
+# tasks file for provision_docker
+
+- name: set_fact container_data_dict as a dict, which key is docker image name and value is a list of container name and expose port
+  set_fact:
+    container_data_dict: "{{ container_data_dict|default({}) | combine( {item.1 : [provision_docker_container_prefix + item.0|string, provision_docker_ssh_port_from + item.0]} ) }}"
+  with_indexed_items: "{{provision_docker_container_images}}"
+
+- debug: var=container_data_dict
+
+- name: docker rm all testing containers
+  command: "docker rm -f {{ item.value.0 }}"
+  loop: "{{ container_data_dict | dict2items }}"
+
+- name: docker run all testing containers
+  command: docker run -d -p "{{ item.value.1 }}":22 --name "{{ item.value.0 }}" "{{item.key}}"
+  loop: "{{ container_data_dict | dict2items }}"
+
+- name: Add containers into inventory
+  add_host:
+    hostname: "{{ item.value.0 }}"
+    ansible_ssh_host: '127.0.0.1'
+    ansible_ssh_port: "{{ item.value.1 }}"
+    ansible_ssh_user: 'root'
+    ansible_ssh_pass: 'root'
+    groups:
+      - "{{ provision_docker_host_group }}"
+  loop: "{{ container_data_dict | dict2items }}"
